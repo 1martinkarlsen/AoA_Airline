@@ -100,7 +100,7 @@ public class FlightThread extends Thread implements Runnable {
             // Modtager som GBP og ikke EUR.            
             flight.addProperty("totalPrice", pricedItinerary.getAsJsonObject().getAsJsonObject("AirItineraryPricingInfo")
                     .getAsJsonObject("PTC_FareBreakdowns").getAsJsonObject("PTC_FareBreakdown").getAsJsonObject("FareInfo")
-                    .getAsJsonObject("PassengerFare").getAsJsonObject("TotalFare").get("@Amount").getAsString());
+                    .getAsJsonObject("PassengerFare").getAsJsonObject("TotalFare").get("@Amount").getAsNumber());
             // Flight ID
             String str = pricedItinerary.getAsJsonObject().getAsJsonObject("AirItinerary").getAsJsonObject("OriginDestinationOptions")
                     .getAsJsonObject("OriginDestinationOption").getAsJsonObject("FlightSegment").getAsJsonObject("MarketingAirline").get("@Code").getAsString() +
