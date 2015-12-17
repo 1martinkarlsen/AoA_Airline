@@ -105,4 +105,51 @@ public class FlightInfoControl {
             return flightList;
         }
     }
+
+    public List<JsonObject> getFlightsFromOriginAndDestination(String from, String to, String date, int numTickets) throws NoFlightsFoundException, NoServerConnectionFoundException, InterruptedException {
+        List<JsonObject> flightList = new ArrayList();
+        JsonObject flight = new JsonObject();
+        String london = "LHR"; // London --> has to be origin or destination to get any flights
+        String toDestination = "";
+        String fromOrigin = "";
+        String jsonStr = null;
+        Date date2;
+        boolean isDestinationAccessable = false;
+
+        ExecutorService service = Executors.newFixedThreadPool(1);
+        
+        /*
+         *   The amount of flights will be scaled down because of the limited amount of API calls per day, we have from British Airways.
+         *   Therefore the only distinations we got, will be those from "destinationList" and "London".
+         *
+         *   We will check if "from" parameter is one of these destinations, if not we will return a NoFlightsFoundException.
+         */
+        if (from.equals(london)) {
+            fromOrigin = from;
+            toDestination = to;
+        } else if (to.equals(london)) {
+            toDestination = to;
+            fromOrigin = from;
+        } else {
+            throw new NoFlightsFoundException(1, "No Flights found.");
+        }
+
+        String urlToUse = "https://api.ba.com/rest-v1/v1/flightOfferMktAffiliates;departureDateTimeOutbound=" + date + ";locationCodeOriginOutbound=" + fromOrigin + ";locationCodeDestinationOutbound=" + toDestination + ";cabin=Economy;ADT=" + numTickets + ";CHD=0;INF=0;format=.json";
+
+        try {
+            FlightThread flightThread = new FlightThread(flightList, urlToUse);
+            service.submit(flightThread);
+        } catch (Exception e) {
+            throw new NoServerConnectionFoundException(10, "Could not connect to url API.");
+        }
+
+        service.shutdown();
+        service.awaitTermination(1, TimeUnit.MINUTES);
+
+        if (flightList.size() <= 0) {
+            throw new NoFlightsFoundException(1, "Could not find any flights.");
+        } else {
+            return flightList;
+        }
+    }
 }
