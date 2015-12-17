@@ -1,9 +1,16 @@
 package control;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import exception.NoFlightsFoundException;
 import exception.NoServerConnectionFoundException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -12,6 +19,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.joda.time.DateTime;
+import org.joda.time.Minutes;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
 public class FlightInfoControl {
     
@@ -31,7 +42,8 @@ public class FlightInfoControl {
         Date date2;
         boolean isDestinationAccessable = false;
         
-        ExecutorService service = Executors.newFixedThreadPool(5);
+        // Threadpool sættes til 1 da BA API har begrænset API kald i sekundet.
+        ExecutorService service = Executors.newFixedThreadPool(1);
         
         /*
         *   The amount of flights will be scaled down because of the limited amount of API calls per day, we have from British Airways.

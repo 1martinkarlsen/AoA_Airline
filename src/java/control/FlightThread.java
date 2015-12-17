@@ -9,6 +9,7 @@ import com.google.gson.JsonParser;
 import entity.Flight;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
@@ -39,13 +40,14 @@ public class FlightThread extends Thread implements Runnable {
     @Override
     public void run() {
         StringBuilder sb = new StringBuilder();
-        URLConnection urlConn = null;
+        HttpURLConnection urlConn = null;
         InputStreamReader in = null;
         try {
             URL url = new URL(urlToUse);
             
-            urlConn = url.openConnection();
-            urlConn.setRequestProperty("Content-Type", "application/json");
+            // Sættes til 1 sekund sleep da BA API har begrænset API kald i sekundet.
+            Thread.sleep(1000);
+            urlConn = (HttpURLConnection) url.openConnection();
             urlConn.setRequestProperty("client-key", "9kc4my2t28pry8vmmk5m4hvx");
             
             if (urlConn != null) {
