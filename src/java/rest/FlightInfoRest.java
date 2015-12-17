@@ -73,7 +73,15 @@ public class FlightInfoRest {
             throw new InvalidDataException(3, "Illegal input (Date format)");
         }
         
-        return Response.ok(gson.toJson(flightControl.getFlightsFromOrigin(from, date, numTickets)), MediaType.APPLICATION_JSON).build();
+        JsonObject response = new JsonObject();
+        response.addProperty("airline", "AoA-Airline (British Airways)");
+        JsonArray jsonArr = new JsonArray();
+        for(JsonObject flight : flightControl.getFlightsFromOrigin(from, date, numTickets)) {
+            jsonArr.add(flight);
+        }
+        response.add("flights", jsonArr);
+        
+        return Response.ok(gson.toJson(response), MediaType.APPLICATION_JSON).build();
     }
     
     
