@@ -31,11 +31,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
 @Path("flightinfo")
 public class FlightInfoRest {
 
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").setPrettyPrinting().create();
     FlightInfoControl flightControl = new FlightInfoControl();
     
     @Context
@@ -49,7 +52,6 @@ public class FlightInfoRest {
     @Path("{from}/{date}/{numTickets}")
     public Response getFlightsFromOrigin(@PathParam("from") String from, @PathParam("date") String date, @PathParam("numTickets") int numTickets) throws InvalidDataException, NoFlightsFoundException, NoServerConnectionFoundException, InterruptedException {
 
-        Date date2;
         
         /*
         * Checking for illegal inputs
@@ -59,11 +61,15 @@ public class FlightInfoRest {
             throw new InvalidDataException(3, "Illegal input (Origin)");
         }
         
+        Date date2;
+        
         // Check if able to parse date to right format.
-        try {
-            DateFormat sdfISO = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        try {            
+            DateFormat sdfISO = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            DateFormat sdfISO2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             date2 = sdfISO.parse(date);
-        } catch (ParseException e) {
+            date = sdfISO2.format(date2);
+        } catch (Exception e) {
             throw new InvalidDataException(3, "Illegal input (Date format)");
         }
         
